@@ -1,21 +1,36 @@
 import { createClient } from "@/lib/supabase/server"
+'use client'
+
+import { useEffect, useState } from "react"
+import { supabase } from "@/lib/supabase/client"
 import Navigation from "@/components/navigation"
 import Link from "next/link"
 
-async function getOrders() {
-  const supabase = createClient()
-  const { data: orders, error } = await supabase.from("orders").select("*").order("created_at", { ascending: false })
+export default function OrdersPage() {
+  const [orders, setOrders] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
 
-  if (error) {
-    console.error("Error fetching orders:", error)
-    return []
-  }
+  useEffect(() => {
+    async function fetchOrders() {
+      try {
+        const { data: orders, error } = await supabase.from("orders").select("*").order("created_at", { ascending: false })
+        
+        if (error) {
+          console.error("Error fetching orders:", error)
+          setOrders([])
+        } else {
+          setOrders(orders || [])
+        }
+      } catch (error) {
+        console.error("Error fetching orders:", error)
+        setOrders([])
+      } finally {
+        setLoading(false)
+      }
+    }
 
-  return orders || []
-}
-
-export default async function OrdersPage() {
-  const orders = await getOrders()
+    fetchOrders()
+  }, [])
 
   const getStatusColors = (status: string) => {
     switch (status.toLowerCase()) {
@@ -48,6 +63,11 @@ export default async function OrdersPage() {
             <p className="text-[#181411] tracking-light text-[32px] font-bold leading-tight min-w-72">Orders</p>
           </div>
 
+          {loading ? (
+            <div className="px-4 py-3 text-center">
+              <p className="text-[#8a7360]">Loading orders...</p>
+            </div>
+          ) : (
           <div className="px-4 py-3 @container">
             <div className="flex overflow-hidden rounded-lg border border-[#e6e0db] bg-white">
               <table className="flex-1">
@@ -106,6 +126,7 @@ export default async function OrdersPage() {
               </table>
             </div>
           </div>
+          )}
         </div>
       </div>
 
