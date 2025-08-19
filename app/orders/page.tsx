@@ -1,17 +1,8 @@
 "use client"
 
-import { createClient } from "@supabase/supabase-js"
+import { supabase } from "@/lib/supabase/client"
 import Navigation from "@/components/navigation"
 import Link from "next/link"
-
-const supabaseUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL
-const supabaseKey = process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-
-if (!supabaseUrl || !supabaseKey) {
-  throw new Error("Missing Supabase environment variables")
-}
-
-const supabase = createClient(supabaseUrl, supabaseKey)
 
 async function getOrders() {
   const { data: orders, error } = await supabase.from("orders").select("*").order("created_at", { ascending: false })
