@@ -4,6 +4,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useEffect, useState } from "react"
 import { supabase } from "@/lib/supabase/client"
+import { isSupabaseConfigured } from "@/lib/supabase/client"
 import { signOut } from "@/lib/actions"
 
 interface User {
@@ -21,6 +22,13 @@ export default function Header() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    // If Supabase is not configured, set defaults and return early
+    if (!isSupabaseConfigured) {
+      setUser(null)
+      setLoading(false)
+      return
+    }
+
     // Get initial session
     const getSession = async () => {
       const {
