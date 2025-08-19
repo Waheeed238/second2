@@ -1,10 +1,9 @@
-"use client"
-
-import { supabase } from "@/lib/supabase/client"
+import { createClient } from "@/lib/supabase/server"
 import Navigation from "@/components/navigation"
 import Link from "next/link"
 
 async function getOrders() {
+  const supabase = createClient()
   const { data: orders, error } = await supabase.from("orders").select("*").order("created_at", { ascending: false })
 
   if (error) {
